@@ -76,7 +76,7 @@
                 // Display response details
                 responseContainer.textContent = `Status: ${response.status} ${response.statusText}\n\nHeaders:\n${
                     Array.from(response.headers.entries())
-                        .map(([key, value]) => ${key}: ${value})
+                        .map(([key, value]) => `${key}: ${value}`)
                         .join('\n')
                 }\n\nBody:\n${responseText}`;
                 
