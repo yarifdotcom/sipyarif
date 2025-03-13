@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIPRES API Request Sender</title>
+    <title>SIPRES API Request Sender RANDOM </title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,9 +43,8 @@
     </div>
 
     <script>
-        function getRandomThreeDigits() {
-            return Math.floor(100 + Math.random() * 900); // Menghasilkan angka acak antara 100-999
-        }
+        const baseLongitude = 112.0122268;
+        const baseLatitude = -7.827246;
 
         document.getElementById('sendRequest').addEventListener('click', async function() {
             const url = 'https://sipres.kedirikab.go.id/api/presensi/present';
@@ -55,8 +54,12 @@
                 responseContainer.textContent = 'Sending request...';
                 
                 // Generate random latitude & longitude
-                const longitude = `112.012${getRandomThreeDigits()}`;
-                const latitude = `-7.827${getRandomThreeDigits()}`;
+
+                // Approximately 0.0002 degrees is about 20 meters
+                const randomOffset = () => (Math.random() - 0.5) * 0.0004;
+                
+                const longitude = (parseFloat(baseLongitude) + randomOffset()).toFixed(7);
+                const latitude = (parseFloat(baseLatitude) + randomOffset()).toFixed(7);
 
                 // Create request options
                 const options = {
