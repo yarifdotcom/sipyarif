@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPRES API Request Sender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIPRES API Request Sender</h1>
+    <button id="sendRequest">Send Request</button>
+    <div>
+        <h3>Response:</h3>
+        <div id="responseContainer" class="response">Response will appear here...</div>
+    </div>
+
+    <script>
+        function getRandomThreeDigits() {
+            return Math.floor(100 + Math.random() * 900); // Menghasilkan angka acak antara 100-999
+        }
+
+        document.getElementById('sendRequest').addEventListener('click', async function() {
+            const url = 'https://sipres.kedirikab.go.id/api/presensi/present';
+            const responseContainer = document.getElementById('responseContainer');
+            
+            try {
+                responseContainer.textContent = 'Sending request...';
+                
+                // Generate random latitude & longitude
+                const longitude = `112.012${getRandomThreeDigits()}`;
+                const latitude = `-7.827${getRandomThreeDigits()}`;
+
+                // Create request options
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'User-Agent': 'Dart/2.19 (dart:io)',
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Accept-Encoding': 'gzip',
+                        'Authorization': 'Bearer 43012|bavgtj42oAcXMkFrVlsdhiJfXMmAIkxJ6n00dXjj',
+                        'Host': 'sipres.kedirikab.go.id'
+                    },
+                    body: JSON.stringify({
+                        "longitude": longitude,
+                        "latitude": latitude,
+                        "jenis": "0"
+                    })
+                };
+                
+                // Send the request
+                const response = await fetch(url, options);
+                
+                // Get response as text
+                const responseText = await response.text();
+                
+                // Display response details
+                responseContainer.textContent = `Longitude: ${longitude}\nLatitude: ${latitude}\n\nStatus: ${response.status} ${response.statusText}\n\nHeaders:\n${
+                    Array.from(response.headers.entries())
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join('\n')
+                }\n\nBody:\n${responseText}`;
+                
+            } catch (error) {
+                // Display any errors
+                responseContainer.textContent = `Error: ${error.message}`;
+                console.error('Request failed:', error);
+            }
+        });
+    </script>
+</body>
+</html>
