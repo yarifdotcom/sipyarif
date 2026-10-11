@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+         .location-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: Arial, sans-serif;
+            margin-bottom: 2rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            background-color: #9ca3af;
+            border-radius: 28px;
+            transition: 0.3s;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .switch input:checked + .slider {
+            background-color: #16a34a;
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(22px);
+        }
+    </style>
+</head>
+<body>
+    <div class="location-switch">
+        <label class="switch">
+            <input type="checkbox" id="switchSentra">
+            <span class="slider"></span>
+        </label>
+
+        <label for="switchSentra" id="labelLokasi">
+            Default
+        </label>
+    </div>
+
+    <button id="sendRequest">Send Request</button>
+    <div>
+        <h3>Response:</h3>
+        <div id="responseContainer" class="response">Response will appear here...</div>
+    </div>
+
+    <script>
+        let baseLongitude = 112.0122268;
+        let baseLatitude = -7.827246;
+
+        const switchSentra = document.getElementById("switchSentra");
+        const labelLokasi = document.getElementById("labelLokasi");
+
+        switchSentra.addEventListener("change", function () {
+            if (this.checked) {
+                // Lokasi Sentra
+                baseLongitude = 112.04186902563113;
+                baseLatitude = -7.809849601135138;
+
+                labelLokasi.textContent = "Sentra";
+            } else {
+                // Kembali ke lokasi Default
+                baseLongitude = 112.0122268;
+                baseLatitude = -7.827246;
+
+                labelLokasi.textContent = "Default";
+            }
+        });
+
+        document.getElementById('sendRequest').addEventListener('click', async function() {
+            const url = 'https://sipres.kedirikab.go.id/api/presensi/present';
+            const responseContainer = document.getElementById('responseContainer');
+            
+            try {
+                responseContainer.textContent = 'Sending request...';
+                
+                // Generate random latitude & longitude
+
+                // Approximately 0.0002 degrees is about 20 meters
+                const randomOffset = () => (Math.random() - 0.5) * 0.0004;
+                
+                const longitude = (parseFloat(baseLongitude) + randomOffset()).toFixed(7);
+                const latitude = (parseFloat(baseLatitude) + randomOffset()).toFixed(7);
+
+                // Create request options
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'User-Agent': 'Dart/2.19 (dart:io)',
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Accept-Encoding': 'gzip',
+                        'Authorization': 'Bearer 43012|bavgtj42oAcXMkFrVlsdhiJfXMmAIkxJ6n00dXjj',
+                        'Host': 'sipres.kedirikab.go.id'
+                    },
+                    body: JSON.stringify({
+                        "longitude": longitude,
+                        "latitude": latitude,
+                        "jenis": "0"
+                    })
+                };
+                
+                // Send the request
+                const response = await fetch(url, options);
+                
+                // Get response as text
+                const responseText = await response.text();
+                
+                // Display response details
+                responseContainer.textContent = `Longitude: ${longitude}\nLatitude: ${latitude}\n\nStatus: ${response.status} ${response.statusText}\n\nHeaders:\n${
+                    Array.from(response.headers.entries())
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join('\n')
+                }\n\nBody:\n${responseText}`;
+                
+            } catch (error) {
+                // Display any errors
+                responseContainer.textContent = `Error: ${error.message}`;
+                console.error('Request failed:', error);
+            }
+        });
+    </script>
+</body>
+</html>
